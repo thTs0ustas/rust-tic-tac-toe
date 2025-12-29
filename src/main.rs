@@ -1,8 +1,8 @@
 mod game;
 mod player;
 mod turn;
-use crate::game::gm::Game;
-use crate::player::player::Player;
+use crate::game::Game;
+use crate::player::Player;
 
 fn main() {
     println!("Hello, world!");
