@@ -1,5 +1,5 @@
-use crate::player::Player;
-use crate::turn::Turn;
+use super::player::Player;
+use super::turn::Turn;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum Cell {
@@ -78,11 +78,14 @@ impl Game {
             })
             .collect();
 
-        println!("{} | {} | {}", elements[0], elements[1], elements[2]);
-        println!("---------");
-        println!("{} | {} | {}", elements[3], elements[4], elements[5]);
-        println!("---------");
-        println!("{} | {} | {}", elements[6], elements[7], elements[8]);
+        println!("elements: {:?}", elements);
+
+        for (i, chunk) in elements.chunks(3).enumerate() {
+            println!(" {} | {} | {} ", chunk[0], chunk[1], chunk[2]);
+            if i < 2 {
+                println!("-----------");
+            }
+        }
     }
 
     fn update_board(&mut self, idx: usize) {

@@ -1,8 +1,5 @@
-mod game;
-mod player;
-mod turn;
-use crate::game::Game;
-use crate::player::Player;
+mod internals;
+use internals::{game, player};
 
 fn main() {
     println!("Hello, world!");
@@ -11,13 +8,13 @@ fn main() {
 
     println!("------------------");
     println!("Enter name for Player 1 (X): ");
-    let player1 = Player {
+    let player1 = player::Player {
         name: read_player(),
     };
 
     println!("------------------");
     println!("Enter name for Player 2 (O): ");
-    let player2 = Player {
+    let player2 = player::Player {
         name: read_player(),
     };
 
@@ -26,7 +23,7 @@ fn main() {
     println!("Player 2: {:?}", player2);
     println!("------------------\n\n");
 
-    let mut game = Game::new(player1, player2);
+    let mut game = game::Game::new(player1, player2);
     game.play();
 }
 
