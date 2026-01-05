@@ -1,10 +1,23 @@
 use super::player::Player;
 use super::turn::Turn;
+use std::fmt;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum Cell {
     Empty,
     Taken(Turn),
+}
+
+impl fmt::Display for Cell {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Cell::Empty => write!(f, " "),
+            Cell::Taken(turn) => match turn {
+                Turn::X => write!(f, "X"),
+                Turn::O => write!(f, "O"),
+            },
+        }
+    }
 }
 pub struct Game {
     board: [Cell; 9],
@@ -16,17 +29,7 @@ pub struct Game {
 impl Game {
     pub fn new(player1: Player, player2: Player) -> Self {
         Self {
-            board: [
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-                Cell::Empty,
-            ],
+            board: [Cell::Empty; 9],
             current_turn: Turn::X,
             player1,
             player2,
@@ -65,23 +68,17 @@ impl Game {
     }
 
     fn render(&self) {
-        let elements: Vec<String> = self
-            .board
-            .iter()
-            .enumerate()
-            .map(|(idx, cell)| match cell {
-                Cell::Empty => (idx + 1).to_string(),
-                Cell::Taken(c) => match c {
-                    Turn::X => "X".to_string(),
-                    Turn::O => "O".to_string(),
-                },
-            })
-            .collect();
+        for (i, chunk) in self.board.chunks(3).enumerate() {
+            let row_cells: Vec<String> = chunk
+                .iter()
+                .enumerate()
+                .map(|(j, cell)| match cell {
+                    Cell::Empty => ((i * 3) + j + 1).to_string(),
+                    _ => cell.to_string(),
+                })
+                .collect();
 
-        println!("elements: {:?}", elements);
-
-        for (i, chunk) in elements.chunks(3).enumerate() {
-            println!(" {} | {} | {} ", chunk[0], chunk[1], chunk[2]);
+            println!(" {} | {} | {} ", row_cells[0], row_cells[1], row_cells[2]);
             if i < 2 {
                 println!("-----------");
             }
@@ -142,5 +139,53 @@ impl Game {
 
             self.current_turn = self.current_turn.other();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_initial_state() {
+        let p1 = Player { name: "A".into() };
+        let p2 = Player { name: "B".into() };
+        let game = Game::new(p1, p2);
+        assert!(game.winner().is_none());
+        assert!(!game.is_draw());
+    }
+
+    #[test]
+    fn test_x_wins() {
+        let p1 = Player { name: "A".into() };
+        let p2 = Player { name: "B".into() };
+        let mut game = Game::new(p1, p2);
+
+        // X moves 0
+        game.update_board(0);
+        // Force turn switch manually for setup?
+        // update_board uses current_turn.
+        game.current_turn = Turn::O;
+
+        // O moves 3
+        game.update_board(3);
+        game.current_turn = Turn::X;
+
+        // X moves 1
+        game.update_board(1);
+        game.current_turn = Turn::O;
+
+        // O moves 4
+        game.update_board(4);
+        game.current_turn = Turn::X;
+
+        // X moves 2
+        game.update_board(2);
+
+        // Check winner. Winner logic checks current_turn (X) and board.
+        // If X connects 0,1,2, winner() returns Some(p1) because current_turn is X.
+        let w = game.winner();
+        assert!(w.is_some());
+        assert_eq!(w.unwrap().name, "A");
     }
 }

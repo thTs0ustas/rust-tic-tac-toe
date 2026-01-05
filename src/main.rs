@@ -31,6 +31,7 @@ fn read_player() -> String {
     let mut buf = String::new();
 
     loop {
+        buf.clear();
         match std::io::stdin().read_line(&mut buf) {
             Ok(_) if !buf.trim().is_empty() => {
                 return buf.trim().to_owned();

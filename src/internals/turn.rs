@@ -4,7 +4,7 @@ pub enum Turn {
     O,
 }
 impl Turn {
-    pub fn other(&mut self) -> Self {
+    pub fn other(self) -> Self {
         match self {
             Turn::X => Turn::O,
             Turn::O => Turn::X,
